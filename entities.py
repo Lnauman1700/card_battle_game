@@ -28,12 +28,12 @@ class Player(Entity):
         super(Player, self).__init__(name)
         self.item_mod = 0
         self.draw_pile = [
-            cards.Card(2,0,0,0,1),
-            cards.Card(2,0,0,0,1),
-            cards.Card(2,0,0,0,1),
-            cards.Card(2,0,0,0,1),
-            cards.Card(2,0,0,0,1),
-            cards.Card(2,0,0,0,1)
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
+            cards.Card(0,3,0,0,1, 'Costs 1 energy. Heals 3 health'),
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
+            cards.Card(0,0,0,2,2, 'Costs 2 energy. Buffs strength by 2'),
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage')
         ]
         self.discard_pile = []
         self.hand = []
@@ -51,6 +51,58 @@ class Player(Entity):
                     rando = random.randint(0, len(self.discard_pile))
                     self.draw_pile.append(discard_pile.pop(rando))
 
+        self.current_hand()
+
+    def draw_one(self):
+        if len(self.draw_pile) > 0:
+            self.hand.append(self.draw_pile.pop(0))
+        else:
+            while len(self.discard_pile) > 0:
+                rando = random.randint(0, len(self.discard_pile))
+                self.draw_pile.append(discard_pile.pop(rando))
+            self.hand.append(self.draw_pile.pop(0))
+
+    def use(self, index):
+        if index < len(self.hand):
+            played_card = self.hand[index]
+
+            if self.energy < played_card.energy:
+                print("You don't have enough energy to use that card!")
+                print(f"remaining energy: {self.energy}")
+            else:
+                # apply played_card's health buffs to the player's health
+                self.health += played_card.health
+                # apply played_card's defense buffs
+
+                # apply played_card's strength buffs (how does this one work?)
+                self.strength += played_card.strength_buff
+                # remove energy from player based on card's energy
+                self.energy -= played_card.energy
+                # pop the card from your hand, add it to the front of discard pile
+                self.discard_pile.insert(0, self.hand.pop(index))
+                # let the user know what the card they just played did.
+                played_card.print_effects()
+                # return the damage
+                return played_card.damage
+
+        else:
+            print("That card doesn't exist. It might've been used up or you might've put in the wrong number")
+        # I'd like to give the player a list of cards they can use, but it doesn't work if we return a value
+
+    # gives player the option to end their turn early
+    def end_turn(self):
+        print("You ended your turn")
+        # resets the energy back to default, we don't want our player farming energy after all
+        self.energy = 3
+
+
+    # prints out the curent hand and what each card does. Also shows what you'd enter to play a card.
+    def current_hand(self):
+
+        index = 0
+        for item in self.hand:
+            print(f"{index}. {item.description}")
+            index += 1
 
 
     def attack(self):
@@ -74,3 +126,9 @@ class Enemy(Entity):
 player = Player('Bill')
 player.draw()
 print(len(player.hand))
+player.use(0)
+player.use(0)
+player.use(0)
+print(len(player.hand))
+print(player.energy)
+player.end_turn()
