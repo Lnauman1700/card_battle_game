@@ -49,7 +49,7 @@ class Player(Entity):
             else:
                 while len(self.discard_pile) > 0:
                     rando = random.randint(0, len(self.discard_pile))
-                    self.draw_pile.append(discard_pile.pop(rando))
+                    self.draw_pile.append(self.discard_pile.pop(rando))
 
         self.current_hand()
 
@@ -78,10 +78,10 @@ class Player(Entity):
                 self.strength += played_card.strength_buff
                 # remove energy from player based on card's energy
                 self.energy -= played_card.energy
-                # pop the card from your hand, add it to the front of discard pile
-                self.discard_pile.insert(0, self.hand.pop(index))
                 # let the user know what the card they just played did.
                 played_card.print_effects()
+                # pop the card from your hand, add it to the front of discard pile
+                self.discard_pile.insert(0, self.hand.pop(index))
                 # return the damage
                 return played_card.damage
 
@@ -94,6 +94,9 @@ class Player(Entity):
         print("You ended your turn")
         # resets the energy back to default, we don't want our player farming energy after all
         self.energy = 3
+        # we need to discard all cards in the hand
+        while len(self.hand) > 0:
+            self.discard_pile.insert(0, self.hand.pop(0))
 
 
     # prints out the curent hand and what each card does. Also shows what you'd enter to play a card.
@@ -132,3 +135,4 @@ player.use(0)
 print(len(player.hand))
 print(player.energy)
 player.end_turn()
+player.draw()
