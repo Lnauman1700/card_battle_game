@@ -46,6 +46,7 @@ class Player(Entity):
         self.energy = 3
         self.strength = 0
 
+    # allows the player to draw all the cards they need at beginning of turn
     def draw(self):
         iterations = 0
 
@@ -58,8 +59,9 @@ class Player(Entity):
                     rando = random.randint(0, len(self.discard_pile))
                     self.draw_pile.append(self.discard_pile.pop(rando))
 
-        self.current_hand()
 
+
+    # allows the player to draw one card
     def draw_one(self):
         if len(self.draw_pile) > 0:
             self.hand.append(self.draw_pile.pop(0))
@@ -69,6 +71,7 @@ class Player(Entity):
                 self.draw_pile.append(discard_pile.pop(rando))
             self.hand.append(self.draw_pile.pop(0))
 
+    # allows player to use card at the index in their hand
     def use(self, index):
         if index < len(self.hand):
             played_card = self.hand[index]
@@ -118,11 +121,58 @@ class Player(Entity):
             print(f"{index}. {item.description}")
             index += 1
 
-
+    # prints player's current health
     def get_current_health(self):
         print(f"Current health is {self.health}")
 
+    # allows the player to make their decisions during their turn
+    def my_turn(self, enemy):
+        # player draws their hand
+        self.draw()
+        # show the player their hand
+        self.current_hand()
+
+        # allows for the player to do everything they need to
+        while len(self.hand) > 0 and enemy.health > 0:
+
+            choice = input('> ')
+
+            val = 1000
+            try:
+                val = int(choice)
+            except ValueError:
+                pass
+
+            if val < len(self.hand):
+                enemy.lower_health(self.use(val))
+            elif "hand" in choice:
+                self.current_hand()
+            elif "health" in choice:
+                self.get_current_health()
+            elif "end" in choice:
+                # also makes the player discard all cards in hand, so it should end the loop
+                self.end_turn()
+            elif "energy" in choice:
+                print(f"You have {self.energy} energy remaining")
+            else:
+                print("couldn't understand that.")
+
+
     # potential add_item function to add an item to our dict inventory
+
+    # shuffles the list (pile) we sent in
+    def shuffle_pile(self, pile):
+        random.shuffle(pile)
+
+    # returns all cards to the draw pile and shuffles them.
+    def reset_piles(self):
+
+        while len(self.discard_pile) > 0:
+            self.draw_pile.append(self.discard_pile.pop(0))
+        while len(self.hand) > 0:
+            self.draw_pile.append(self.hand.pop(0))
+
+        self.shuffle_pile(self.draw_pile)
 
 
 class Enemy(Entity):
