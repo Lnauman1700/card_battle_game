@@ -11,23 +11,29 @@ class Entity(object):
 
     # lower_health function which takes self, damage and lowers health by damage
     def lower_health(self, damage):
-        self.health -= damage
+        if isinstance(damage, int):
+            self.health -= damage
+            if damage > 0:
+                print(f"{self.name} lost {damage} health.")
 
     # attack method which takes self, returns number = self.strength + any item modifier. may require another param of item
     def attack(self):
-        print(f"{self.name} did {self.strength} damage")
         return self.strength
 
 class Player(Entity):
 
     # dictionary (?) with all items currently in posession.
 
-
     # inherits __init__, lower_health, and attack (attack may need changed to suit item use)
     def __init__(self, name):
         super(Player, self).__init__(name)
-        self.item_mod = 0
         self.draw_pile = [
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
+            cards.Card(0,3,0,0,1, 'Costs 1 energy. Heals 3 health'),
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
+            cards.Card(0,0,0,2,2, 'Costs 2 energy. Buffs strength by 2'),
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
+            cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
             cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
             cards.Card(0,3,0,0,1, 'Costs 1 energy. Heals 3 health'),
             cards.Card(2,0,0,0,1, 'Costs 1 energy. Deals 2 damage'),
@@ -38,6 +44,7 @@ class Player(Entity):
         self.discard_pile = []
         self.hand = []
         self.energy = 3
+        self.strength = 0
 
     def draw(self):
         iterations = 0
@@ -69,6 +76,7 @@ class Player(Entity):
             if self.energy < played_card.energy:
                 print("You don't have enough energy to use that card!")
                 print(f"remaining energy: {self.energy}")
+                return 0;
             else:
                 # apply played_card's health buffs to the player's health
                 self.health += played_card.health
@@ -83,7 +91,10 @@ class Player(Entity):
                 # pop the card from your hand, add it to the front of discard pile
                 self.discard_pile.insert(0, self.hand.pop(index))
                 # return the damage
-                return played_card.damage
+                if played_card.damage > 0:
+                    return played_card.damage + self.strength
+                else:
+                    return played_card.damage
 
         else:
             print("That card doesn't exist. It might've been used up or you might've put in the wrong number")
@@ -108,10 +119,6 @@ class Player(Entity):
             index += 1
 
 
-    def attack(self):
-        print(f"You did {self.strength + self.item_mod} damage")
-        return self.strength + self.item_mod
-
     def get_current_health(self):
         print(f"Current health is {self.health}")
 
@@ -125,14 +132,3 @@ class Enemy(Entity):
         self.name = name
         self.health = health
         self.strength = strength
-
-player = Player('Bill')
-player.draw()
-print(len(player.hand))
-player.use(0)
-player.use(0)
-player.use(0)
-print(len(player.hand))
-print(player.energy)
-player.end_turn()
-player.draw()

@@ -1,5 +1,6 @@
 
 import entities
+import cards
 # in each room, there should be a while loop that loops till one entity is dead
 # each iteration of the loop, the player goes first and chooses what to do via an input()
 # dealing damage is enemy.lose_health(player.attack())
@@ -9,34 +10,40 @@ import entities
 player = entities.Player("Phil")
 enemy = entities.Enemy("James", 8, 2)
 
+
 while player.health > 0 and enemy.health > 0:
 
-    print("You can attack! to attack, just say attack")
-    choice = input('> ')
+    # player draws their hand
+    player.draw()
 
-    if "attack" in choice:
-        enemy.lower_health(player.attack())
-    else:
-        # sample for if you chose something else, like running away
-        print("You ran!")
+    # allows for the player to do everything they need to
+    while len(player.hand) > 0 and enemy.health > 0:
 
-    # here the enemy can be influenced depending on what the situation looks like:
-    if enemy.health < 5:
-        print("Wait, I'll stop fighting! Put your weapon down!")
-        decision = input('> ')
-        if "stop" in decision:
-            print("You left yourself open!")
-            player.lower_health(enemy.attack())
-            player.lower_health(enemy.attack())
+        choice = input('> ')
+
+        val = 1000
+        try:
+            val = int(choice)
+        except ValueError:
+            pass
+
+        if val < len(player.hand):
+            enemy.lower_health(player.use(val))
+        elif "hand" in choice:
+            player.current_hand()
+        elif "health" in choice:
+            player.get_current_health()
+        elif "end" in choice:
+            # also makes the player discard all cards in hand, so it should end the loop
+            player.end_turn()
+        elif "energy" in choice:
+            print(f"You have {player.energy} energy remaining")
         else:
-            print("You managed to get an extra hit in while he was trying to surrender!")
-            enemy.lower_health(player.attack())
+            print("couldn't understand that.")
 
-    else:
-        player.lower_health(enemy.attack())
+    player.lower_health(enemy.attack())
 
 if player.health <= 0:
-    # ideally, this'd be a return statement instead of a print, which would influence the next room.
     print("You died")
 else:
-    print("You won! now let's resume where we left off")
+    print("You win!")
