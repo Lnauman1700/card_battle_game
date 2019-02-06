@@ -20,6 +20,9 @@ class Entity(object):
     def attack(self):
         return self.strength
 
+    def my_turn(self):
+        pass
+
 class Player(Entity):
 
     # dictionary (?) with all items currently in posession.
@@ -182,3 +185,11 @@ class Enemy(Entity):
         self.name = name
         self.health = health
         self.strength = strength
+
+    # my_turn function, which will determine how the enemy acts. By default, they'll simply attack
+    def my_turn(self, player):
+        player.lower_health(self.attack())
+
+
+# more enemy classes will override Enemy's my_turn to do specific things on specific turns
+# for instance, maybe we'll have a goblin that, during their turn, has a chance to try and steal a card from you 
