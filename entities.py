@@ -53,14 +53,21 @@ class Player(Entity):
     def draw(self):
         iterations = 0
 
+        # while loop signifying how many times we draw cards from our hand
         while iterations < 4:
+            # as long as the draw pile has cards in it, we draw from it
             if len(self.draw_pile) > 0:
                 self.hand.append(self.draw_pile.pop(0))
                 iterations += 1
+            #if the draw pile doesn't have cards in it...
             else:
-                while len(self.discard_pile) > 0:
-                    rando = random.randint(0, len(self.discard_pile))
-                    self.draw_pile.append(self.discard_pile.pop(rando))
+                # shuffles discard pile and adds it to the draw pile
+                random.shuffle(self.discard_pile)
+                for card in self.discard_pile:
+                    self.draw_pile.append(card)
+                #clears discard pile
+                self.discard_pile = []
+
 
 
 
@@ -69,9 +76,11 @@ class Player(Entity):
         if len(self.draw_pile) > 0:
             self.hand.append(self.draw_pile.pop(0))
         else:
-            while len(self.discard_pile) > 0:
-                rando = random.randint(0, len(self.discard_pile))
-                self.draw_pile.append(discard_pile.pop(rando))
+            random.shuffle(self.discard_pile)
+            for card in self.discard_pile:
+                self.draw_pile.append(card)
+            #clears discard pile
+            self.discard_pile = []
             self.hand.append(self.draw_pile.pop(0))
 
     # allows player to use card at the index in their hand
@@ -192,4 +201,4 @@ class Enemy(Entity):
 
 
 # more enemy classes will override Enemy's my_turn to do specific things on specific turns
-# for instance, maybe we'll have a goblin that, during their turn, has a chance to try and steal a card from you 
+# for instance, maybe we'll have a goblin that, during their turn, has a chance to try and steal a card from you

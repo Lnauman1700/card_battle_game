@@ -67,12 +67,24 @@ You locate him, but it looks like he's not going down without a fight
 class ThiefBand(Room):
 
     def interact(self, player):
+        print("""
+You proceed, your wallet now back in your hands, towards the dungeon.
+You feel like you're being followed...
+Soon before you enter the dungeon, it becomes apparent who you were followed by
+It seems that pickpocket had friends. A band of thieves emerges
+The leader presents himself, and initiates a fight!
+        """)
         self.battle(player)
         return self.get_next_room()
 
 class Dungeon(Room):
 
     def interact(self, player):
+        print("""
+Now that those bandits are taken care of, It's time to go into the dungeon!
+Uh-oh. That sounds like a Dragon
+Yup, it's a dragon. Time to fight.
+        """)
         self.battle(player)
         return self.get_next_room()
 
@@ -99,8 +111,3 @@ class Map(object):
         else:
             # lets you interact with the death room
             self.rooms[next].interact()
-
-
-you = entities.Player("You")
-map = Map(you)
-map.run()
